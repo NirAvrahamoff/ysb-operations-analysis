@@ -1,4 +1,4 @@
-# 📦 YSB Inventory & Supply Chain Analysis
+#  YSB Inventory & Supply Chain Analysis
 
 ## Project Overview
 
