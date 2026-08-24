@@ -26,7 +26,7 @@ The project was implemented using:
 
 ---
 
-# 📊 Average Monthly Supply vs Demand Gap
+# Average Monthly Supply vs Demand Gap
 
 This visualization shows the average monthly gap between **supply and demand per item**.
 
@@ -42,7 +42,7 @@ Key insights:
 
 ---
 
-# 📦 Monthly Inventory Movement Trends
+# Monthly Inventory Movement Trends
 
 This chart tracks **inventory inflow (Inbound)** and **outflow (Outbound)** over time.
 
@@ -56,7 +56,7 @@ Observations:
 
 ---
 
-# 💰 Cumulative Inventory Value Over Time
+# Cumulative Inventory Value Over Time
 
 This visualization tracks the cumulative inventory value of the **top three most expensive items**.
 
@@ -84,7 +84,7 @@ Key observations:
 
 ---
 
-# ⏱ Lead Time Variability Analysis
+# Lead Time Variability Analysis
 
 This analysis focuses on items with the **highest lead time variability** and **longest average lead time**.
 
@@ -98,7 +98,7 @@ Insights:
 
 ---
 
-# 🕒 Items with the Longest Average Lead Time
+# Items with the Longest Average Lead Time
 
 This chart highlights the **top 10 items with the longest average supplier lead time**.
 
@@ -112,7 +112,7 @@ Observations:
 
 ---
 
-# 🚚 Supplier Delivery Frequency
+# Supplier Delivery Frequency
 
 This visualization shows the **top 20 suppliers by monthly delivery frequency**.
 
@@ -125,7 +125,7 @@ Key insights:
 
 ---
 
-# 💎 Top Physical Items by Inventory Value
+# Top Physical Items by Inventory Value
 
 This chart shows the **top 7 items with the highest inventory value**.
 
