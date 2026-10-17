@@ -1,168 +1,113 @@
-#  YSB Inventory & Supply Chain Analysis
+# YSB Inventory and Supply Chain Analysis
+
+Independent analysis of five months of ERP data from YSB, an Israeli infrastructure contractor, covering inventory value, shortages and surpluses, demand stability, supplier lead times and items that are ordered together.
+
+The data is published with YSB's permission.
+
+## Background
+
+I did this project as a Data Analyst at Genesis Accelerator. A startup in the program was building a product that connects a company's operational systems and generates insights from them. To evaluate the product, I was asked to analyse the same YSB data on my own and produce a baseline that the startup's output could be compared against.
+
+This repository contains that baseline: what the data shows, what it cannot show, and what information YSB would need to provide to take the analysis further.
+
+## Key findings
+
+| # | Finding | Number |
+|---|---|---|
+| 1 | Inventory value is highly concentrated | 6.5% of items in stock hold 80% of the ₪10.7M value |
+| 2 | Truly idle stock is small, but a lot of stock moves without a customer order | ₪58K with no movement at all; ₪3.0M (28%) with no customer demand |
+| 3 | Half of the apparent shortages are already covered by stock on hand | 733 items flagged by receipts vs demand, 361 after counting opening stock |
+| 4 | Surpluses come from bulk-ordered fasteners | One washer item: projected surplus of 38,040 units, about 30× its five-month demand |
+| 5 | High-value items have unstable demand | 50 of 65 A items have variable or erratic demand, 58% of consumption value |
+| 6 | Supplier lead times have long tails | Median 10 days, but 1 in 10 order lines takes 53 days or more |
+| 7 | Clear product kits exist in the orders | 89% of terminal clamp orders include side plates, at a median of 14 clamps per plate |
+| 8 | Open purchase commitments are large and concentrated | ₪9.8M with no receipt yet; 5 lines make up 42% of it |
+
+![Inventory value Pareto](images/01_inventory_value_pareto.png)
+
+## Analysis
+
+The full analysis is in [`notebooks/ysb_operations_analysis.ipynb`](notebooks/ysb_operations_analysis.ipynb).
+
+| Section | Question | Method |
+|---|---|---|
+| Data quality | Can the data be trusted, and what are its gaps? | Coverage, status filtering, order-to-receipt matching |
+| ABC by stock value | Where is the money tied up? | Pareto split at 80% / 95% of year-end value |
+| Idle stock | What is in stock but not used? | Stock with no demand, and with no movement at all; write-offs |
+| Projected balance | Which items are really short or in surplus? | Opening stock + receipts − customer demand |
+| ABC-XYZ | Which items are both valuable and hard to predict? | Consumption value × coefficient of variation of monthly demand |
+| Supplier lead times | How long do suppliers take, and how consistent are they? | Days from purchase order to first goods receipt, by supplier |
+| Open commitments | How much is ordered but not yet received? | Order lines with no matching receipt |
+| Items ordered together | Which items behave as kits? | Pair counts, confidence, lift and quantity ratio per order |
+
+<table>
+<tr>
+<td><img src="images/03_abc_xyz_matrix.png" alt="ABC-XYZ matrix"></td>
+<td><img src="images/05_items_ordered_together.png" alt="Items ordered together"></td>
+</tr>
+<tr>
+<td><img src="images/02_projected_stock_balance.png" alt="Projected stock balance"></td>
+<td><img src="images/04_supplier_lead_times.png" alt="Supplier lead times"></td>
+</tr>
+</table>
+
+## Data limitations
+
+The analysis explains what the current data can explain. These gaps limit how far it can go:
+
+| Missing information | Why it matters |
+|---|---|
+| Holding cost per item | Purchase price alone does not show what an item costs to keep in stock |
+| Item criticality | A cheap item that stops a project matters more than an expensive optional one |
+| Bills of materials and kit definitions | Kits are inferred from orders here; the real definitions would make planning exact |
+| Promised delivery dates | The requested-date field equals the order date in 92% of lines, so on-time performance cannot be measured |
+| Consumption at project sites | Transfers to sites are not consumption, so idle stock may be sitting there |
+| A longer history | Five months is too short for seasonality or reliable forecasts |
+
+The comparison between this baseline and the startup's product was carried out by the startup and the accelerator team.
+
+## What changed from the first version
+
+The first version of this analysis (2025) is kept in [`notebooks/archive/`](notebooks/archive/original_analysis_2025.ipynb), together with the original summary report in Hebrew in [`reports/`](reports/original_findings_summary_he.pdf). This version:
+
+- counts opening stock in shortage and surplus figures, which changes the picture for many items;
+- excludes cancelled, rejected and draft orders from demand;
+- measures lead time from purchase order to actual receipt only, after finding that the requested-date field is not used;
+- adds ABC-XYZ classification, an idle stock check, open commitments and an analysis of items ordered together;
+- adds a section on data limitations and the information needed to go further;
+- replaces repeated code with one load-and-clean step and English column names.
+
+## Repository structure
+
+```
+ysb-operations-analysis/
+├── README.md
+├── requirements.txt
+├── data/                     Raw ERP exports (see data/README.md)
+├── notebooks/
+│   ├── ysb_operations_analysis.ipynb   Current analysis
+│   └── archive/
+│       └── original_analysis_2025.ipynb
+├── images/                   Charts used in this README
+├── outputs/                  Result tables (CSV)
+└── reports/
+    └── original_findings_summary_he.pdf
+```
+
+## How to run
+
+```bash
+pip install -r requirements.txt
+cd notebooks
+jupyter notebook ysb_operations_analysis.ipynb
+```
 
-## Project Overview
+The notebook reads from `data/` and writes charts to `images/` and tables to `outputs/`.
 
-This project analyzes inventory, demand, supply, and supplier behavior using operational data from YSB.
+## Tools
 
-The goal of the analysis is to identify:
+Python, pandas, NumPy, Matplotlib, Jupyter.
 
-- Supply shortages and surpluses
-- Demand vs supply gaps
-- Inventory movement trends
-- Lead time variability
-- High-value inventory items
-- Supplier delivery patterns
+## Author
 
-The analysis helps reveal operational inefficiencies and opportunities to improve inventory management and supply chain planning.
-
-The project was implemented using:
-
-- Python
-- Pandas
-- NumPy
-- Matplotlib
-- Seaborn
-- Jupyter Notebook
-
----
-
-# Average Monthly Supply vs Demand Gap
-
-This visualization shows the average monthly gap between **supply and demand per item**.
-
-Positive values indicate **surplus**, while negative values indicate **shortage**.
-
-![Average Monthly Gap](ysb_image/avrage_monthly.png)
-
-Key insights:
-
-- Several items experience significant shortages where demand exceeds supply.
-- Some items show strong surplus, indicating potential overstock.
-- Identifying these items helps prioritize procurement and inventory balancing.
-
----
-
-# Monthly Inventory Movement Trends
-
-This chart tracks **inventory inflow (Inbound)** and **outflow (Outbound)** over time.
-
-![Inventory Movement](ysb_image/monthly_intentory.png)
-
-Observations:
-
-- Inventory inflow varies significantly between months.
-- Outbound movement is relatively smaller compared to inbound shipments.
-- Peaks in inbound inventory may indicate major procurement cycles.
-
----
-
-# Cumulative Inventory Value Over Time
-
-This visualization tracks the cumulative inventory value of the **top three most expensive items**.
-
-![Inventory Value Over Time](ysb_image/over_time.png)
-
-Insights:
-
-- Certain items dominate the inventory value.
-- Inventory value for these items steadily increases over time.
-- Monitoring high-value inventory is essential for financial risk management.
-
----
-
-# 📈 Demand vs Supply for Key Items
-
-The following charts compare **monthly demand and supply** for several critical items.
-
-![Demand vs Supply](ysb_image/supply_deamand.png)
-
-Key observations:
-
-- Some items consistently show demand exceeding supply.
-- Certain months show large supply fluctuations.
-- These patterns may indicate forecasting issues or procurement delays.
-
----
-
-# Lead Time Variability Analysis
-
-This analysis focuses on items with the **highest lead time variability** and **longest average lead time**.
-
-![Lead Time Analysis](ysb_image/top5.png)
-
-Insights:
-
-- Some items show extremely high lead time variability.
-- High variability makes inventory planning more difficult.
-- These items may require safety stock adjustments.
-
----
-
-# Items with the Longest Average Lead Time
-
-This chart highlights the **top 10 items with the longest average supplier lead time**.
-
-![Longest Lead Time](ysb_image/top10.png)
-
-Observations:
-
-- Certain items require significantly longer delivery times.
-- Long lead times increase the risk of stock shortages.
-- These items require early procurement planning.
-
----
-
-# Supplier Delivery Frequency
-
-This visualization shows the **top 20 suppliers by monthly delivery frequency**.
-
-![Supplier Frequency](ysb_image/top20.png)
-
-Key insights:
-
-- Some suppliers provide frequent deliveries and may be considered reliable partners.
-- Others appear less frequently and may represent specialized or infrequent suppliers.
-
----
-
-# Top Physical Items by Inventory Value
-
-This chart shows the **top 7 items with the highest inventory value**.
-
-![Top Inventory Value](ysb_image/top7.png)
-
-Observations:
-
-- A small number of items represent a large portion of total inventory value.
-- These items require careful monitoring due to their financial impact.
-
----
-
-# 🔍 Key Insights
-
-From the analysis we can conclude:
-
-- Several items suffer from persistent supply shortages.
-- Some inventory is overstocked, suggesting inefficient procurement.
-- High lead time variability increases supply chain risk.
-- A small number of items dominate total inventory value.
-- Supplier behavior varies significantly in delivery frequency.
-
-These insights can help improve:
-
-- Demand forecasting
-- Inventory planning
-- Procurement strategies
-- Supplier management
-
----
-
-# 🛠 Technologies Used
-
-- Python
-- Pandas
-- NumPy
-- Matplotlib
-- Seaborn
-- Jupyter Notebook
-
+**Nir Avrahamoff**, Data Analyst. Project completed at Genesis Accelerator.
